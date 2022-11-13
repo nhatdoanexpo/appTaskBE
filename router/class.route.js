@@ -11,6 +11,10 @@ router.get('/:id',ClassController.getClass),
 router.put('/:id',ClassController.editClass)
 router.delete('/:id', ClassController.deleteClass)
 router.get('/getclassmentor/:userID',ClassController.getClassByMentor)
+router.post('/addStudent/:classID',ClassController.addStudent)
+router.get('/getclass_student/:userID',ClassController.getClassByStudent)
+
+
 
 
 

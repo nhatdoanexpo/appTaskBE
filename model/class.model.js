@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const ClassModel = new mongoose.Schema({
+const ClassModel = mongoose.Schema({
     code : {
         type : String,
         require : true,
@@ -13,6 +13,13 @@ const ClassModel = new mongoose.Schema({
         type : mongoose.Types.ObjectId,
         ref : 'user'
     }
+,
+student : {
+    type : [{
+        type : mongoose.Types.ObjectId,
+        ref : 'users'
+    }],
+}
 ,
     note : {
         type : String

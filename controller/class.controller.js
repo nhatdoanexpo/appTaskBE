@@ -95,7 +95,49 @@ const ClassController = {
             console.log(error)
             res.status(500).json(createError(false,'Loi he thong'))
         }
-    }
+    },
+    addStudent : async (req,res) => {
+        const {listStudent} = req.body
+        const {classID} = req.params
+        try {
+            const classData = await classModel.findOne({
+                _id : classID
+            })
+            if (!classData) {
+                res.status(400).json(createError(false,'Khong ton tai thong tin lop hoc'))
+            }else {
+                const newListStudent = classData.student.push(listStudent)
+                await classModel.findByIdAndUpdate(classID,{
+                    student : newListStudent
+                })
+                res.status(400).json(createError(true,'Add hoc sinh thanh cong'))
+            }
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(createError(false,'Loi he thong'))
+        }
+    },
+    getClassByStudent : async(req,res) => {
+        const {userID} = req.params
+        try {
+            const classData = await classModel.find({
+                student: {
+                    "$in" : [userID]
+                }
+            }).populate({
+                path : "mentor",
+                select : "name email",
+                remove : '_id'
+            })
+            if (!classData) {
+                res.status(200).json(createError(false,'Khong co thong tin lop hoc'))
+            }
+            res.status(200).json(classData)
+        } catch (error) {
+            console.log(error)
+            res.status(500).json(createError(false,'Loi he thong'))
+        }
+    },
 }
 
 module.exports = ClassController;

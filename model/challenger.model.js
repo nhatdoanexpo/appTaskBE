@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const ChallengerModel = new mongoose.Schema({
+const ChallengerModel =  new mongoose.Schema({
     classID : {
         type : mongoose.Schema.Types.ObjectId,
         require : true
