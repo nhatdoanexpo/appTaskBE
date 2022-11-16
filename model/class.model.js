@@ -14,12 +14,12 @@ const ClassModel = mongoose.Schema({
         ref : 'user'
     }
 ,
-student : {
-    type : [{
-        type : mongoose.Types.ObjectId,
-        ref : 'users'
-    }],
-}
+ student: [{
+        user: {
+            type: mongoose.Types.ObjectId,
+            ref: 'users'
+        }
+    }]
 ,
     note : {
         type : String
