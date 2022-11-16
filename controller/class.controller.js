@@ -105,10 +105,9 @@ const ClassController = {
             })
             if (!classData) {
                 res.status(400).json(createError(false,'Khong ton tai thong tin lop hoc'))
-            }else {
-                const newListStudent = classData.student.push(listStudent)
+            }else { 
                 await classModel.findByIdAndUpdate(classID,{
-                    student : newListStudent
+                    student : listStudent
                 })
                 res.status(400).json(createError(true,'Add hoc sinh thanh cong'))
             }
