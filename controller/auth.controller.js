@@ -222,6 +222,40 @@ const authController = {
                 code: user?._doc?.code,
                 email: user?._doc?.email,
             }
+
+            if(listClassUserMap && userMap.role == 'HV'){
+                for (const item of listClassUserMap) {
+
+                    const listChallenger = await Challenger.find({classID : item.id}).exec();
+
+                    const listChallengerMap = listChallenger.map( x => {
+                        return { id : x?._doc?._id }
+                    } );
+
+                    if(listChallengerMap){
+                        for (const challen of listChallengerMap) {
+
+                            const performance =  await performanceModel.findOne({challengerID : challen.id,
+                                mentorSent : item.mentor, toStudent : userMap.id
+                            });
+
+                            if(!performance){
+                                const newPerformacne = new performanceModel({
+                                    mentorSent : item.mentor,
+                                    challengerID : challen.id,
+                                    toStudent : userMap.id
+                                })
+                                await newPerformacne.save()
+                            }
+
+
+                        }
+                    }
+
+                }
+            }
+
+
             if(user){
                 res.status(200).json( { user: userMap, listClassData: listClassUserMap})
             }else{

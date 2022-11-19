@@ -3,6 +3,7 @@ const classModel = require("../model/class.model")
 const performanceModel = require("../model/performance.model")
 const createError = require("../utils/errors")
 const Challenger = require("../model/challenger.model");
+const User = require("../model/user.model");
 
 
 const PerformanceController = {
@@ -43,52 +44,6 @@ const PerformanceController = {
         try {
             if (!studentID) {
                 res.status(400).json(createError(false,'Thieu thong tin bat buoc'))
-            }
-            const listClassUser = await classModel.find().populate({
-                path: 'student',
-                user: studentID
-            });
-            const listClassUserMap = listClassUser.map( x => {
-                return { id : x?._doc?._id  ,name: x._doc?.name,
-                    mentor: x?._doc?.mentor}
-            } );
-            const userMap = { id : user?._doc._id ,
-                name:  user?._doc?.name,
-                code: user?._doc?.code,
-                email: user?._doc?.email,
-                role: user?._doc?.role
-            }
-
-            if(listClassUserMap && userMap.role == 'HV'){
-                for (const item of listClassUserMap) {
-
-                    const listChallenger = await Challenger.find({classID : item.id}).exec();
-
-                    const listChallengerMap = listChallenger.map( x => {
-                        return { id : x?._doc?._id }
-                    } );
-
-                    if(listChallengerMap){
-                        for (const challen of listChallengerMap) {
-
-                            const performance =  await performanceModel.findOne({challengerID : challen.id,
-                                mentorSent : item.mentor, toStudent : userMap.id
-                            });
-
-                            if(!performance){
-                                const newPerformacne = new performanceModel({
-                                    mentorSent : item.mentor,
-                                    challengerID : challen.id,
-                                    toStudent : userMap.id
-                                })
-                                await newPerformacne.save()
-                            }
-
-
-                        }
-                    }
-
-                }
             }
 
             const listPerfomace = await performanceModel.find({
