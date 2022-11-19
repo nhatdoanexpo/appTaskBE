@@ -97,21 +97,20 @@ const authController = {
             let error = createError(true, 'Dang nhap thanh cong')
             // console.log({...error,role : user.role, accessToken})
 
-
-            const listClassUser = await  classModel.find().populate({
-                path: 'student',
-                user: user
-            });
-            const listClassUserMap = listClassUser.map( x => {
-                return { id : x?._doc?._id  ,name: x._doc?.name,
-                    mentor: x?._doc?.mentor}
-            } );
             const userMap = { id : user?._doc._id ,
                 name:  user?._doc?.name,
                 code: user?._doc?.code,
                 email: user?._doc?.email,
                 role: user?._doc?.role
             }
+
+            const listClassUser = await  classModel.find({ student : {$elemMatch : { user : userMap.id } }});
+
+            const listClassUserMap = listClassUser.map( x => {
+                return { id : x?._doc?._id  ,name: x._doc?.name,
+                    mentor: x?._doc?.mentor}
+            } );
+
 
            if(listClassUserMap && userMap.role == 'HV'){
                for (const item of listClassUserMap) {
@@ -209,20 +208,19 @@ const authController = {
         try {
             const {id} = req.params
             const user = await User.findById(id)
-            const listClassUser = await  classModel.find().populate({
-                path: 'student',
-                user: user
-            });
-            const listClassUserMap = listClassUser.map( x => {
-                return { id : x?._doc?._id  ,name: x._doc?.name,
-                    mentor: x?._doc?.mentor}
-            } );
             const userMap = { id : user?._doc._id ,
                 name:  user?._doc?.name,
                 code: user?._doc?.code,
                 email: user?._doc?.email,
                 role: user?._doc?.role
             }
+
+            const listClassUser = await  classModel.find({ student : {$elemMatch : { user : userMap.id } }});
+
+            const listClassUserMap = listClassUser.map( x => {
+                return { id : x?._doc?._id  ,name: x._doc?.name,
+                    mentor: x?._doc?.mentor}
+            } );
 
             if(listClassUserMap && userMap.role == 'HV'){
                 for (const item of listClassUserMap) {
