@@ -3,6 +3,9 @@ const jwt = require('jsonwebtoken')
 
 const User = require('../model/user.model');
 const createError = require('../utils/errors');
+const classModel = require("../model/class.model");
+const performanceModel = require("../model/performance.model");
+const Challenger = require("../model/challenger.model");
 
 
 // dung tam sau add redis sau :
@@ -93,7 +96,60 @@ const authController = {
             })
             let error = createError(true, 'Dang nhap thanh cong')
             // console.log({...error,role : user.role, accessToken})
-            res.status(200).json({ ...error, role: user.role, accessToken, pushtoken })
+
+
+            const listClassUser = await  classModel.find().populate({
+                path: 'student',
+                user: user
+            });
+            const listClassUserMap = listClassUser.map( x => {
+                return { id : x?._doc?._id  ,name: x._doc?.name,
+                    mentor: x?._doc?.mentor}
+            } );
+            const userMap = { id : user?._doc._id ,
+                name:  user?._doc?.name,
+                code: user?._doc?.code,
+                email: user?._doc?.email,
+                role: user?._doc?.role
+            }
+
+           if(listClassUserMap && userMap.role == 'HV'){
+               for (const item of listClassUserMap) {
+
+                   const listChallenger = await Challenger.find({classID : item.id}).exec();
+
+                   const listChallengerMap = listChallenger.map( x => {
+                       return { id : x?._doc?._id }
+                   } );
+
+                   if(listChallengerMap){
+                       for (const challen of listChallengerMap) {
+
+                           const performance =  await performanceModel.findOne({challengerID : challen.id,
+                               mentorSent : item.mentor, toStudent : userMap.id
+                           });
+
+                          if(!performance){
+                              const newPerformacne = new performanceModel({
+                                  mentorSent : item.mentor,
+                                  challengerID : challen.id,
+                                  toStudent : userMap.id
+                              })
+                              await newPerformacne.save()
+                          }
+
+
+                       }
+                   }
+
+               }
+           }
+
+
+
+
+            res.status(200).json({ ...error, role: user.role, accessToken, pushtoken ,
+                user: userMap, listClassData: listClassUserMap})
         } catch (error) {
             console.log(error)
             return res.status(500).json(
@@ -148,7 +204,39 @@ const authController = {
                 createError(false, 'Loi he thong')
             )
         }
+    },
+    getUser: async (req, res) => {
+        try {
+            const {id} = req.params
+            const user = await User.findById(id)
+            const listClassUser = await  classModel.find().populate({
+                path: 'student',
+                user: user
+            });
+            const listClassUserMap = listClassUser.map( x => {
+                return { id : x?._doc?._id  ,name: x._doc?.name,
+                    mentor: x?._doc?.mentor}
+            } );
+            const userMap = { id : user?._doc._id ,
+                name:  user?._doc?.name,
+                code: user?._doc?.code,
+                email: user?._doc?.email,
+            }
+            if(user){
+                res.status(200).json( { user: userMap, listClassData: listClassUserMap})
+            }else{
+                res.status(400).json(
+                    createError(false, 'không tìm thấy')
+                )
+            }
+        } catch (error) {
+            console.log(error)
+            return res.status(500).json(
+                createError(false, 'Loi he thong')
+            )
+        }
     }
+
 }
 
 module.exports = authController;

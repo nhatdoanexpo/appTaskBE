@@ -11,8 +11,7 @@ router.post('/register',authController.registerUser)
 router.post('/login', authController.loginUser)
 router.post('/refresh',authController.requestRefreshToken)
 router.get('/listuser',middleware.verifyAdmin,authController.getAllUser)
-
-
+router.get('/userById/:id',authController.getUser)
 
 
 module.exports = router;

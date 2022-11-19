@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-const ClassModel = mongoose.Schema({
+const ClassModel = new mongoose.Schema({
     code : {
         type : String,
         require : true,
