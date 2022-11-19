@@ -221,6 +221,7 @@ const authController = {
                 name:  user?._doc?.name,
                 code: user?._doc?.code,
                 email: user?._doc?.email,
+                role: user?._doc?.role
             }
 
             if(listClassUserMap && userMap.role == 'HV'){
