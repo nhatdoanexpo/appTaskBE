@@ -99,6 +99,7 @@ const ClassController = {
     addStudent : async (req,res) => {
         const {listStudent} = req.body
         const {classID} = req.params
+
         try {
             const classData = await classModel.findOne({
                 _id : classID
@@ -106,7 +107,8 @@ const ClassController = {
             if (!classData) {
                 res.status(400).json(createError(false,'Khong ton tai thong tin lop hoc'))
             }else {
-              //  const newListStudent = classData.student.push(listStudent)
+
+
                 await classModel.findByIdAndUpdate(classID,{
                     student : listStudent
                 })
