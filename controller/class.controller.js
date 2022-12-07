@@ -1,5 +1,6 @@
 const classModel = require("../model/class.model")
 const createError = require("../utils/errors")
+const User = require("../model/user.model");
 
 const ClassController = {
     addClass : async (req, res) => {
@@ -84,13 +85,37 @@ const ClassController = {
         }
     },
     getClassByMentor : async (req,res) => {
-        const {userID} = req.params 
+        const {userID} = req.params
+
         try {
             const listClassByMentor = await classModel.find({
                 mentor : userID
             })
+            let classMap = [];
             console.log(listClassByMentor)
-            res.status(200).json({listClass : listClassByMentor,...createError(true,'Get list theo GV')})
+            if(listClassByMentor){
+                for (const item of listClassByMentor) {
+                    let classItem = item?._doc
+                    let students = classItem?.student;
+                    let studentsMap = [];
+                    for (const st of students) {
+                    const user = await User.findOne({ _id: st?._doc.user })
+                    const userMap = { id : user?._doc._id ,
+                        name:  user?._doc?.name,
+                        code: user?._doc?.code,
+                        email: user?._doc?.email,
+                        role: user?._doc?.role
+                    }
+                     console.log(userMap)
+                     studentsMap.push(userMap)
+                    }
+                    classItem = {...classItem, studentsDetail:studentsMap}
+                    classMap.push(classItem)
+                }
+
+            }
+            console.log(listClassByMentor)
+            res.status(200).json({listClass : classMap,...createError(true,'Get list theo GV')})
         } catch (error) {
             console.log(error)
             res.status(500).json(createError(false,'Loi he thong'))
