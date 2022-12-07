@@ -12,6 +12,7 @@ router.post('/login', authController.loginUser)
 router.post('/refresh',authController.requestRefreshToken)
 router.get('/listuser',middleware.verifyAdmin,authController.getAllUser)
 router.get('/userById/:id',authController.getUser)
+router.post('/uploadImage',authController.uploadImage)
 
 
 module.exports = router;
